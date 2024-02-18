@@ -23,8 +23,8 @@
  *@brief  : The Three System Clocks to Be Selected
  */
 #define SYS_CLK_HSI 0x00
-#define SYS_CLK_HSE 0x01
-#define SYS_CLK_PLL 0x10
+#define SYS_CLK_HSE 0x00000001
+#define SYS_CLK_PLL 0x00000002
 
 /**
  *@brief  :AHB1 Peripherals

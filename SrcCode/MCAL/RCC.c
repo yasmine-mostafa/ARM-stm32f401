@@ -222,7 +222,7 @@ RCC_Error_t RCC_SelectSysClk(u32 Sys)
 	if(Sys == SYS_CLK_HSI)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_HSI))
+		if(RCC_GetReadyStatus(CLK_RDY_HSI)==RCC_OK)
 		{
 			/*Temporary Var to Store the CFGR Register*/
 			u32 Loc_Temp=RCC->RCC_CFGR;
@@ -242,7 +242,7 @@ RCC_Error_t RCC_SelectSysClk(u32 Sys)
 	else if(Sys == SYS_CLK_HSE)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_HSE))
+		if(RCC_GetReadyStatus(CLK_RDY_HSE)==RCC_OK)
 		{
 			u32 Loc_Temp=RCC->RCC_CFGR;
 			Loc_Temp&=SYS_CLK_CLEAR;
@@ -258,7 +258,7 @@ RCC_Error_t RCC_SelectSysClk(u32 Sys)
 	else if(Sys == SYS_CLK_PLL)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_PLL))
+		if(RCC_GetReadyStatus(CLK_RDY_PLL)==RCC_OK)
 		{
 			u32 Loc_Temp=RCC->RCC_CFGR;
 			Loc_Temp&=SYS_CLK_CLEAR;
@@ -357,6 +357,7 @@ RCC_Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q)
 		Loc_Temp &= PLL_CONFIG_CLEAR;
 
 		/*Set the PLL Config Bits*/
+		PLL_P=(PLL_P/2)-1;
 		Loc_Temp |= PLL_M;
 		Loc_Temp |= PLL_N << PLL_N_SHIFTING;
 		Loc_Temp |= PLL_P << PLL_P_SHIFTING;
