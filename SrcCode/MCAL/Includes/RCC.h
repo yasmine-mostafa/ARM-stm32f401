@@ -111,29 +111,6 @@
  ****************************************************************************************/
 
 /**
-*@brief  :Error Status For Operations
-*/
-typedef enum
-{
-	/**
-	*@brief  :Operation is Done Correctly.
-	*/
-	RCC_OK,
-	/**
-	*@brief  :Operation is Not Done Correctly.
-	*/
-	RCC_NOK,
-	/**
-	*@brief  :Operation is Timed Out.
-	*/
-	RCC_Timeout,
-	/**
-	*@brief  :Invalid Clock Input.
-	*/
-	RCC_InvalidClk,
-}RCC_Error_t;
-
-/**
 *@brief  :PLL Clock Sources (HSE/HSI)
 */
 typedef enum
@@ -163,60 +140,60 @@ typedef enum
  *@param  : Clock To Be Enabled (HSI,HSE,PLL).
  *@return : Error State
  */
-RCC_Error_t RCC_EnableClk(u32 Clk);
+Error_t RCC_EnableClk(u32 Clk);
 /**
  *@brief  : Function to Disable One Of The Three Clocks.
  *@param  : Clock To Be Disabled (HSI,HSE,PLL).
  *@return : Error State
  */
-RCC_Error_t RCC_DisableClk(u32 Clk);
+Error_t RCC_DisableClk(u32 Clk);
 /**
  *@brief  : Function to Select One Of The Three Clocks As Sys Clock.
  *@param  : Sys Clock To Be Selected (HSI,HSE,PLL).
  *@return : Error State
  */
-RCC_Error_t RCC_SelectSysClk(u32 Sys);
+Error_t RCC_SelectSysClk(u32 Sys);
 /**
  *@brief  : Function to Select HSI/HSE As PLL Source.
  *@param  : Clock To Be Selected (HSI,HSE).
  *@return : Error State
  */
-RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source);
+Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source);
 /**
  *@brief  : Function to Configure PLL Parameters.
  *@param  : 2<=PLL_M<=63, 192<=PLL_N<=432, PLL_P=2/4/6/8, 2<=PLL_Q<=15.
  *@return : Error State
  */
-RCC_Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q);
+Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q);
 /**
  *@brief  : Function to Configure APB High Speed Bus prescalar.
  *@param  : APB High prescalars (none,2/4/8/16).
  *@return : Error State
  */
-RCC_Error_t RCC_ConfigureAPBHighPrescalar(u32 APB_High_PreScalar);
+Error_t RCC_ConfigureAPBHighPrescalar(u32 APB_High_PreScalar);
 /**
  *@brief  : Function to Configure APB Low Speed Bus prescalar.
  *@param  : APB Low prescalars (none,2/4/8/16).
  *@return : Error State
  */
-RCC_Error_t RCC_ConfigureAPBLowPrescalar(u32 APB_Low_PreScalar);
+Error_t RCC_ConfigureAPBLowPrescalar(u32 APB_Low_PreScalar);
 /**
  *@brief  : Function to Configure AHB Bus prescalar.
  *@param  : AHB prescalars (none,2/4/8/16/64/128/256/512).
  *@return : Error State
  */
-RCC_Error_t RCC_ConfigureAHBPrescalar(u32 AHB_PreScalar);
+Error_t RCC_ConfigureAHBPrescalar(u32 AHB_PreScalar);
 /**
  *@brief  : Function to Enable Peripheral.
  *@param  : Bus ID of Peripheral, Peripheral To Be Enabled.
  *@return : Error State
  */
-RCC_Error_t RCC_EnablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral);
+Error_t RCC_EnablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral);
 /**
  *@brief  : Function to Disable Peripheral.
  *@param  : Bus ID of Peripheral, Peripheral To Be Disabled.
  *@return : Error State
  */
-RCC_Error_t RCC_DisablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral);
+Error_t RCC_DisablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral);
 
 #endif /* MCAL_INCLUDES_RCC_H_ */

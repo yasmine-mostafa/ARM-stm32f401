@@ -10,6 +10,7 @@
  ****************************************************************************************/
 
 #include "STD_TYPES.h"
+#include "Error.h"
 #include "RCC.h"
 
 /****************************************************************************************
@@ -113,7 +114,7 @@ static volatile RCC_Peri_t * const RCC=(volatile RCC_Peri_t*)(RCC_BASE_ADD);
  *@param  : Clock (HSI,HSE,PLL).
  *@return : Error State
  */
-static RCC_Error_t RCC_GetReadyStatus(u32 Clk_Rdy);
+static Error_t RCC_GetReadyStatus(u32 Clk_Rdy);
 /**
  *@brief  : Function to Get The Current Sys Clock.
  *@param  : Void.
@@ -131,9 +132,9 @@ static u32 RCC_GetClkStatus(u32 Clk);
  *                        	              Function Implementations                      *
  ****************************************************************************************/
 
-RCC_Error_t RCC_EnableClk(u32 CLK)
+Error_t RCC_EnableClk(u32 CLK)
 {
-	RCC_Error_t Ret_RCCErrorStatus=RCC_NOK;
+	Error_t Ret_RCCErrorStatus=Error_NOK;
 
 	/*Enable HSI CLK*/
 	if (CLK == CLK_HSI)
@@ -158,15 +159,15 @@ RCC_Error_t RCC_EnableClk(u32 CLK)
 	}
 	else
 	{
-		Ret_RCCErrorStatus=RCC_InvalidClk;
+		Ret_RCCErrorStatus=Error_InvalidInput;
 	}
 
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_DisableClk(u32 Clk)
+Error_t RCC_DisableClk(u32 Clk)
 {
-	RCC_Error_t Ret_RCCErrorStatus=RCC_NOK;
+	Error_t Ret_RCCErrorStatus=Error_NOK;
 
 	/*Get The Current System clock*/
 	u8 Loc_SysClk=RCC_GetSysClk();
@@ -176,7 +177,7 @@ RCC_Error_t RCC_DisableClk(u32 Clk)
 		 /*Check if the Clock is Set as System Clock*/
 		 if(Loc_SysClk == SYS_CLK_HSI_STATUS)
 		 {
-			 Ret_RCCErrorStatus=RCC_NOK;
+			 Ret_RCCErrorStatus=Error_NOK;
 		 }
 		 else
 		 {
@@ -188,7 +189,7 @@ RCC_Error_t RCC_DisableClk(u32 Clk)
 		 /*Check if the Clock is Set as System Clock*/
 		 if(Loc_SysClk == SYS_CLK_HSE_STATUS)
 		 {
-			 Ret_RCCErrorStatus=RCC_NOK;
+			 Ret_RCCErrorStatus=Error_NOK;
 		 }
 		 else
 		 {
@@ -200,7 +201,7 @@ RCC_Error_t RCC_DisableClk(u32 Clk)
 		 /*Check if the Clock is Set as System Clock*/
 		 if(Loc_SysClk == SYS_CLK_PLL_STATUS)
 		 {
-			 Ret_RCCErrorStatus=RCC_NOK;
+			 Ret_RCCErrorStatus=Error_NOK;
 		 }
 		 else
 		 {
@@ -209,20 +210,20 @@ RCC_Error_t RCC_DisableClk(u32 Clk)
 	 }
 	 else
 	 {
-		 Ret_RCCErrorStatus=RCC_InvalidClk;
+		 Ret_RCCErrorStatus=Error_InvalidInput;
 	 }
 
 	 return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_SelectSysClk(u32 Sys)
+Error_t RCC_SelectSysClk(u32 Sys)
 {
-	RCC_Error_t Ret_RCCErrorStatus=RCC_NOK;
+	Error_t Ret_RCCErrorStatus=Error_NOK;
 
 	if(Sys == SYS_CLK_HSI)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_HSI)==RCC_OK)
+		if(RCC_GetReadyStatus(CLK_RDY_HSI)==Error_OK)
 		{
 			/*Temporary Var to Store the CFGR Register*/
 			u32 Loc_Temp=RCC->RCC_CFGR;
@@ -232,60 +233,60 @@ RCC_Error_t RCC_SelectSysClk(u32 Sys)
 			Loc_Temp|=Sys;
 			/*Store the Var in The Register*/
 			RCC->RCC_CFGR=Loc_Temp;
-			Ret_RCCErrorStatus=RCC_OK;
+			Ret_RCCErrorStatus=Error_OK;
 		}
 		else
 		{
-			Ret_RCCErrorStatus=RCC_NOK;
+			Ret_RCCErrorStatus=Error_NOK;
 		}
 	}
 	else if(Sys == SYS_CLK_HSE)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_HSE)==RCC_OK)
+		if(RCC_GetReadyStatus(CLK_RDY_HSE)==Error_OK)
 		{
 			u32 Loc_Temp=RCC->RCC_CFGR;
 			Loc_Temp&=SYS_CLK_CLEAR;
 			Loc_Temp|=Sys;
 			RCC->RCC_CFGR=Loc_Temp;
-			Ret_RCCErrorStatus=RCC_OK;
+			Ret_RCCErrorStatus=Error_OK;
 		 }
 		else
 		{
-			Ret_RCCErrorStatus=RCC_NOK;
+			Ret_RCCErrorStatus=Error_NOK;
 		}
 	}
 	else if(Sys == SYS_CLK_PLL)
 	{
 		/*Check if The Clock is Ready*/
-		if(RCC_GetReadyStatus(CLK_RDY_PLL)==RCC_OK)
+		if(RCC_GetReadyStatus(CLK_RDY_PLL)==Error_OK)
 		{
 			u32 Loc_Temp=RCC->RCC_CFGR;
 			Loc_Temp&=SYS_CLK_CLEAR;
 			Loc_Temp|=Sys;
 			RCC->RCC_CFGR=Loc_Temp;
-			Ret_RCCErrorStatus=RCC_OK;
+			Ret_RCCErrorStatus=Error_OK;
 		 }
 		else
 		{
-			Ret_RCCErrorStatus=RCC_NOK;
+			Ret_RCCErrorStatus=Error_NOK;
 		}
 	}
 	else
 	{
-		Ret_RCCErrorStatus=RCC_InvalidClk;
+		Ret_RCCErrorStatus=Error_InvalidInput;
 	}
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
+Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
 {
-	RCC_Error_t Ret_RCCErrorStatus=RCC_NOK;
+	Error_t Ret_RCCErrorStatus=Error_NOK;
 
 	/*Check if PLL is Enabled*/
 	if(RCC_GetClkStatus(CLK_PLL))
 	{
-		Ret_RCCErrorStatus=RCC_NOK;
+		Ret_RCCErrorStatus=Error_NOK;
 	}
 	else
 	{
@@ -295,7 +296,7 @@ RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
 			/*Check if HSI is Ready */
 			Ret_RCCErrorStatus=RCC_GetReadyStatus(CLK_RDY_HSI);
 
-			if(Ret_RCCErrorStatus==RCC_OK)
+			if(Ret_RCCErrorStatus==Error_OK)
 			{
 				RCC->RCC_PLLCFGR &=~ PLL_SOURCE_MASK;
 			}
@@ -306,7 +307,7 @@ RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
 			/*Check if HSE is Ready */
 			case RCC_PLL_Source_HSE:
 			Ret_RCCErrorStatus=RCC_GetReadyStatus(CLK_RDY_HSE);
-			if(Ret_RCCErrorStatus==RCC_OK)
+			if(Ret_RCCErrorStatus==Error_OK)
 			{
 		    	RCC->RCC_PLLCFGR |= PLL_SOURCE_MASK;
 			}
@@ -315,7 +316,7 @@ RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
 			break;
 
 			default:
-				Ret_RCCErrorStatus=RCC_InvalidClk;
+				Ret_RCCErrorStatus=Error_InvalidInput;
 				break;
 		}
 	}
@@ -323,30 +324,30 @@ RCC_Error_t RCC_SelectPLLSource(RCC_PLL_Source_t RCC_PLL_Source)
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q)
+Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	/*Check if PLL is Enabled*/
 	if(RCC_GetClkStatus(CLK_PLL))
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else if(PLL_M > PLL_M_BOUNDARY2 || PLL_M < PLL_M_BOUNDARY1)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else if(PLL_N > PLL_N_BOUNDARY2 || PLL_N < PLL_N_BOUNDARY1)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else if(PLL_Q > PLL_Q_BOUNDARY2 || PLL_Q < PLL_Q_BOUNDARY1)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else if(!(PLL_P == PLL_P_VALUE1 || PLL_P == PLL_P_VALUE2 || PLL_P == PLL_P_VALUE3 || PLL_P == PLL_P_VALUE4))
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else
 	{
@@ -365,18 +366,18 @@ RCC_Error_t RCC_ConfigurePLL(u32 PLL_M,u32 PLL_N,u32 PLL_P,u32 PLL_Q)
 
 		RCC->RCC_PLLCFGR=Loc_Temp;
 
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 	}
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_ConfigureAPBHighPrescalar(u32 APB_High_Prescalar)
+Error_t RCC_ConfigureAPBHighPrescalar(u32 APB_High_Prescalar)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	if(APB_High_Prescalar >  APB_HIGH_PRESCALAR_16)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else
 	{
@@ -384,19 +385,19 @@ RCC_Error_t RCC_ConfigureAPBHighPrescalar(u32 APB_High_Prescalar)
 		Loc_Temp &= APB_HIGH_PRESCALAR_CLEAR;
 		Loc_Temp |= APB_High_Prescalar;
 		RCC->RCC_CFGR=Loc_Temp;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 	}
 
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_ConfigureAPBLowPrescalar(u32 APB_Low_Prescalar)
+Error_t RCC_ConfigureAPBLowPrescalar(u32 APB_Low_Prescalar)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	if(APB_Low_Prescalar >  APB_LOW_PRESCALAR_16)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else
 	{
@@ -404,19 +405,19 @@ RCC_Error_t RCC_ConfigureAPBLowPrescalar(u32 APB_Low_Prescalar)
 		Loc_Temp &= APB_LOW_PRESCALAR_CLEAR;
 		Loc_Temp |= APB_Low_Prescalar;
 		RCC->RCC_CFGR=Loc_Temp;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 	}
 
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_ConfigureAHBPrescalar(u32 AHB_Prescalar)
+Error_t RCC_ConfigureAHBPrescalar(u32 AHB_Prescalar)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	if(AHB_Prescalar >  AHB_PRESCALAR_512)
 	{
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 	else
 	{
@@ -424,74 +425,74 @@ RCC_Error_t RCC_ConfigureAHBPrescalar(u32 AHB_Prescalar)
 		Loc_Temp &= AHB_PRESCALAR_CLEAR;
 		Loc_Temp |= AHB_Prescalar;
 		RCC->RCC_CFGR=Loc_Temp;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 	}
 
 	return Ret_RCCErrorStatus;
 }
 
-RCC_Error_t RCC_EnablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral)
+Error_t RCC_EnablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	switch(Bus_ID)
 	{
 	case Bus_AHB1:
 		RCC->RCC_AHB1ENR |= Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_AHB2:
 		RCC->RCC_AHB2ENR |= Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_APB1:
 		RCC->RCC_APB1ENR |= Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_APB2:
 		RCC->RCC_APB2ENR |= Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	default:
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 
 	return Ret_RCCErrorStatus;
 }
 
 
-RCC_Error_t RCC_DisablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral)
+Error_t RCC_DisablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral)
 {
-	RCC_Error_t Ret_RCCErrorStatus = RCC_NOK;
+	Error_t Ret_RCCErrorStatus = Error_NOK;
 
 	switch(Bus_ID)
 	{
 	case Bus_AHB1:
 		RCC->RCC_AHB1ENR &=~ Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_AHB2:
 		RCC->RCC_AHB2ENR &=~ Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_APB1:
 		RCC->RCC_APB1ENR &=~ Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	case Bus_APB2:
 		RCC->RCC_APB2ENR &=~ Peripheral;
-		Ret_RCCErrorStatus = RCC_OK;
+		Ret_RCCErrorStatus = Error_OK;
 		break;
 
 	default:
-		Ret_RCCErrorStatus = RCC_NOK;
+		Ret_RCCErrorStatus = Error_NOK;
 	}
 
 	return Ret_RCCErrorStatus;
@@ -501,9 +502,9 @@ RCC_Error_t RCC_DisablePeripheral(RCC_Bus_ID_t Bus_ID,u32 Peripheral)
  ****************************************************************************************/
 
 /*Get if the Clock is Ready or Not*/
-RCC_Error_t RCC_GetReadyStatus(u32 CLK_RDY)
+Error_t RCC_GetReadyStatus(u32 CLK_RDY)
 {
-	RCC_Error_t Ret_RCCErrorStatus=RCC_NOK;
+	Error_t Ret_RCCErrorStatus=Error_NOK;
 	u16 Loc_Timeout=1000;
 
 	while(!(RCC->RCC_CR & CLK_RDY) && Loc_Timeout)
@@ -513,11 +514,11 @@ RCC_Error_t RCC_GetReadyStatus(u32 CLK_RDY)
 
 	if(Loc_Timeout)
 	{
-		Ret_RCCErrorStatus=RCC_OK;
+		Ret_RCCErrorStatus=Error_OK;
 	}
 	else
 	{
-     	Ret_RCCErrorStatus=RCC_Timeout;
+     	Ret_RCCErrorStatus=Error_Timeout;
 	}
 	return Ret_RCCErrorStatus;
 }

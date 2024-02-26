@@ -20,4 +20,6 @@ typedef signed long int s32;
 typedef float f32;
 typedef double d64;
 
+#define NULL ((void*)0)
+
 #endif /* LIB_STD_TYPES_H_ */
