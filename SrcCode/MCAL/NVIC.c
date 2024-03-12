@@ -41,7 +41,7 @@ typedef struct
 	u32 Reserved5[56];
 	//u32 NVIC_IPR[60];
 	u8 NVIC_IPR[240];
-	u32 Reserved6[580];
+	u32 Reserved6[644];
 	u32 NVIC_STIR;
 
 }NVIC_Peri_t;

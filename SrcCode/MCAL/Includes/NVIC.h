@@ -8,13 +8,23 @@
 #ifndef MCAL_INCLUDES_NVIC_H_
 #define MCAL_INCLUDES_NVIC_H_
 
+/****************************************************************************************
+ *                        	                Defines                                     *
+ ****************************************************************************************/
+
+
+/*Sub Priority Grouping*/
 #define PRIORITY_SUBGROUP_0 0x05FA0000   /*4 Group-Priority Bits [7:4] / 0 Sub-Priority Bits [None]*/
 #define PRIORITY_SUBGROUP_1 0x05FA0400   /*3 Group-Priority Bits [7:5] / 1 Sub-Priority Bits [4]*/
 #define PRIORITY_SUBGROUP_2 0x05FA0500   /*2 Group-Priority Bits [7:6] / 2 Sub-Priority Bits [5:4]*/
 #define PRIORITY_SUBGROUP_3 0x05FA0600   /*1 Group-Priority Bits [7] / 3 Sub-Priority Bits [6:4]*/
 #define PRIORITY_SUBGROUP_4 0x05FA0700   /*0 Group-Priority Bits [None] / 3 Sub-Priority Bits [7:4]*/
 
+/****************************************************************************************
+ *                        	              Types                                         *
+ ****************************************************************************************/
 
+/*IRQs*/
 typedef enum
 {
     IRQ_WWDG = 0,               /*!< Window Watchdog interrupt */
@@ -77,16 +87,69 @@ typedef enum
 } IRQ_t;
 
 
+/****************************************************************************************
+ *                        	              Function Prototypes                           *
+ ****************************************************************************************/
 
+/**
+ *@brief  : Function to Enable an IRQ.
+ *@param  : IRQ.
+ *@return : Error State
+ */
 Error_t NVIC_EnableIRQ(IRQ_t IRQ);
+/**
+ *@brief  : Function to Disable an IRQ.
+ *@param  : IRQ.
+ *@return : Error State
+ */
 Error_t NVIC_DisableIRQ(IRQ_t IRQ);
+/**
+ *@brief  : Function to Set IRQ to Pending.
+ *@param  : IRQ.
+ *@return : Error State
+ */
 Error_t NVIC_SetPending(IRQ_t IRQ);
+/**
+ *@brief  : Function to Clear Pending of an IRQ
+ *@param  : IRQ.
+ *@return : Error State
+ */
 Error_t NVIC_ClearPending(IRQ_t IRQ);
+/**
+ *@brief  : Function to Check if an IRQ is Pending.
+ *@param  : IRQ, Pointer to u8 That Will Hold Status.
+ *@return : Error State
+ */
 Error_t NVIC_GetPending(IRQ_t IRQ, u8* Status);
+/**
+ *@brief  : Function to Read Status of an IRQ.
+ *@param  : IRQ, Pointer to u8 That Will Hold Status.
+ *@return : Error State
+ */
 Error_t NVIC_GetActiveStatus(IRQ_t IRQ , u8 * Status);
+/**
+ *@brief  : Function to Set the Priority Grouping.
+ *@param  : PRIORITY_SUBGROUP_0. PRIORITY_SUBGROUP_1, PRIORITY_SUBGROUP_2, PRIORITY_SUBGROUP_3, PRIORITY_SUBGROUP_4.
+ *@return : Error State
+ */
 Error_t NVIC_SetPriorityGrouping(u32 PrioritySubGroup);
+/**
+ *@brief  : Function to Set Priority of an IRQ.
+ *@param  : IRQ, Priority Which Include Both Preemptive and Sub Group.
+ *@return : Error State
+ */
 Error_t NVIC_SetPriority(IRQ_t IRQ, u8 Priority);
+/**
+ *@brief  : Function to Read The Priority of an IRQ.
+ *@param  : IRQ, Pointer to u8 That Will Hold The Priority.
+ *@return : Error State
+ */
 Error_t NVIC_GetPriority(IRQ_t IRQ, u8* Priority);
+/**
+ *@brief  : Function to Generate Software Interrupt.
+ *@param  : IRQ.
+ *@return : Error State
+ */
 Error_t NVIC_GenerateSWInterrupt(IRQ_t IRQ);
 
 #endif /* MCAL_INCLUDES_NVIC_H_ */
