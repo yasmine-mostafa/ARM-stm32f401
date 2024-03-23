@@ -54,3 +54,8 @@ Error_t SWITCH_ReadState(u32 Copy_SwitchID, u8* Add_SwitchState)
 
 	return Ret_SWITCHErrorStatus;
 }
+
+void SWITCH_Runnable(void)
+{
+
+}
