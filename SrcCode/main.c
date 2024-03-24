@@ -73,7 +73,9 @@ main(void)
 
 	//RCC_SelectSysClk(SYS_CLK_HSI);
 	RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOA);
+	RCC_EnablePeripheral(Bus_AHB1,PERIPHERAL_GPIOB);
 	LED_Init();
+	SWITCH_Init();
 	//LED_SetState(LED_1,LED_ON);
     SCHED_Init();
     SCHED_Start();

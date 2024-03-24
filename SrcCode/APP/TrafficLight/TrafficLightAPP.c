@@ -36,18 +36,17 @@ void TrafficLight(void)
 	{
 	case Green:
 		GreenLED();
-		if(Sec % 6 == 0)
+		if(Sec == 6)
 		{
 			State=Yellow;
 			Prev_State = Green;
-			//Sec=0;
+			Sec=0;
 		}
 		break;
 
 	case Yellow:
 		YellowLED();
-
-		if(Sec % 2 == 0)
+		if(Sec == 2)
 		{
 			if(Prev_State == Green)
 			{
@@ -57,17 +56,17 @@ void TrafficLight(void)
 			{
 				State = Green;
 			}
-			//Sec = 0;
+			Sec = 0;
 		}
 		break;
 
 	case Red:
 		RedLED();
-
-		if(Sec % 4 == 0)
+		if(Sec ==  4)
 		{
 			State = Yellow;
 			Prev_State = Red;
+			Sec = 0;
 		}
 		break;
 

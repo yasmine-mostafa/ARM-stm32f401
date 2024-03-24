@@ -2,7 +2,7 @@
  * LED_CFG.c
  *
  *  Created on: Feb 19, 2024
- *      Author: top one
+ *      Author: Yasmine Mostafa
  */
 
 #include "Error.h"
@@ -24,7 +24,7 @@ const LED_Config_t LEDS_Config[_LED_Num]=
 		{
 				.Port=GPIO_PORTA,
 				.Pin=GPIO_PIN2,
-				.Connection = LED_REV,
+				.Connection = LED_FWD,
 				.InitState= LED_OFF
 		},
 		[LED_Red]=

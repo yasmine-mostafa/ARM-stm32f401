@@ -14,6 +14,7 @@
 typedef enum
 {
 	Runnable1,
+	Runnable2,
 	_Runnable_Num
 
 }Runnable_IDs_t;
