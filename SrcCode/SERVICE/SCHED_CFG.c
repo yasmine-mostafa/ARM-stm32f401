@@ -11,8 +11,11 @@
 #include "SCHED.h"
 
 //extern void TrafficLight(void);
-extern void ToggleLED_Runnable(void);
-extern void SWITCH_Runnable(void);
+//extern void ToggleLED_Runnable1(void);
+//extern void SWITCH_Runnable(void);
+//extern void ToggleLED_Runnable2(void);
+extern void LCD_Task(void);
+
 Runnable_Config_t Runnables_Config[_Runnable_Num]=
 {
 	/*[Runnable1]=
@@ -22,7 +25,7 @@ Runnable_Config_t Runnables_Config[_Runnable_Num]=
 			.Runnable_Cbf = TrafficLight
 	}*/
 
-	[Runnable1]=
+	/*[Runnable1]=
 	{
 			.Periodicity_ms=5,
 			.FirstDelay_ms=3,
@@ -32,9 +35,21 @@ Runnable_Config_t Runnables_Config[_Runnable_Num]=
     {
 		    .Periodicity_ms=50,
 			.FirstDelay_ms=50,
-			.Runnable_Cbf = ToggleLED_Runnable
-		},
+			.Runnable_Cbf = ToggleLED_Runnable1
+	},
 
+	[Runnable3]=
+	    {
+			    .Periodicity_ms=50,
+				.FirstDelay_ms=25,
+				.Runnable_Cbf = ToggleLED_Runnable2
+		},*/
 
+	 [Runnable1]=
+		{
+				.Periodicity_ms=2,
+				.FirstDelay_ms=2,
+				.Runnable_Cbf = LCD_Task
+		}
 };
 

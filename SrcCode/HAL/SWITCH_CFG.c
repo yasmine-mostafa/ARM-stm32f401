@@ -23,8 +23,8 @@ const SWITCH_Config_t SWITCHES_Config[_SWITCH_NUM]=
 
 		[SWITCH_2]=
 		{
-				.Port=GPIO_PORTB,
-				.Pin=GPIO_PIN2,
-				.Connection=CONNECTION_PULL_DOWN
+				.Port=GPIO_PORTA,
+				.Pin=GPIO_PIN0,
+				.Connection=CONNECTION_PULL_UP
 		}
 };

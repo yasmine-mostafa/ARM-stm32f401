@@ -14,6 +14,8 @@
 extern const SWITCH_Config_t SWITCHES_Config[_SWITCH_NUM];
 u8 G_SwitchState[_SWITCH_NUM] = {0};
 
+void SWITCH_Runnable(void);
+
 Error_t SWITCH_Init()
 {
 	Error_t Ret_SWITCHErrorStatus=Error_NOK;
@@ -64,9 +66,14 @@ Error_t SWITCH_ReadState(u32 Copy_SwitchID, u8* Add_SwitchState)
 	{
 		Ret_SWITCHErrorStatus=Error_NULLPointer;
 	}
+	else if(Copy_SwitchID > _SWITCH_NUM)
+	{
+		Ret_SWITCHErrorStatus=Error_InvalidInput;
+	}
 	else
 	{
 		*Add_SwitchState=!(G_SwitchState[Copy_SwitchID] ^ ((SWITCHES_Config[Copy_SwitchID].Connection) >> 4));
+		Ret_SWITCHErrorStatus=Error_OK;
 	}
 
 	return Ret_SWITCHErrorStatus;
