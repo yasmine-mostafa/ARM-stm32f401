@@ -77,7 +77,7 @@
 /**
  *@brief  : Alternate Functions.
  */
-/*#define GPIO_AF_SYSTEM        0x00000000
+#define GPIO_AF_SYSTEM        0x00000000
 #define GPIO_AF_TIM1_2          0x00000001
 #define GPIO_AF_TIM3_5          0x00000002
 #define GPIO_AF_TIME9_11        0x00000003
@@ -89,7 +89,7 @@
 #define GPIO_AF_I2C2_3          0x00000009
 #define GPIO_AF_OTG_FS          0x0000000A
 #define GPIO_AF_SDIO            0x0000000C
-#define GPIO_AF_EVENTOUT        0x0000000F*/
+#define GPIO_AF_EVENTOUT        0x0000000F
 
 /**
  *@brief  : Speed.
@@ -131,6 +131,13 @@ typedef struct
  *@return : Error State
  */
 Error_t GPIO_InitPin(GPIO_Config_t * GPIO_Config);
+
+/**
+ *@brief  : Function to Configure GPIO Pin.
+ *@param  : Pointer to GPIO_Config_t Struct.
+ *@return : Error State
+ */
+Error_t GPIO_InitPinAF(GPIO_Config_t * GPIO_Config,u32 GPIO_AF);
 /**
  *@brief  : Function to Set GPIO Pin Value to High or Low.
  *@param  : Port, Pin, State(High or Low).
@@ -143,5 +150,6 @@ Error_t GPIO_SetPinValue(void* GPIO_Port, u8 GPIO_Pin, u8 GPIO_State);
  *@return : Error State
  */
 Error_t GPIO_GetPinValue(void* GPIO_Port, u8 GPIO_Pin, u8 * GPIO_State);
+
 
 #endif /* MCAL_INCLUDES_GPIO_H_ */
