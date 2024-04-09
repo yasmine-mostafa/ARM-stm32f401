@@ -29,7 +29,7 @@
 #define ENTRY_MODE_SET CONCAT(0,0,0,0,0,1,LCD_INCREMENT_MODE,LCD_SHIFT_DISPLAY)
 
 #define NUM_OF_DATA_PINS 8
-#define MAX_BUFFER_SIZE 5
+#define MAX_BUFFER_SIZE 20
 #define ENABLED 1
 #define DISABLED 0
 #define CASE_ZERO 0
@@ -65,14 +65,6 @@ typedef enum
 
 typedef enum
 {
-	Empty, ///mfesh string
-	//Ready,
-	Busy
-
-}LCD_ReqState_t;
-
-typedef enum
-{
 	NoReq,
 	WriteStr,
 	WriteNum,
@@ -80,6 +72,7 @@ typedef enum
 	SetCursor,
 	ReqDone
 }LCD_ReqType_t;
+
 
 typedef struct
 {
@@ -90,22 +83,27 @@ typedef struct
 typedef struct
 {
     u8* Str;  ///For Write String Request
-	u8 Length; ///For Write String Request
 	u8 Num; ///for Write NumRequest
-	LCD_ReqState_t State;
 	LCD_ReqType_t Type;
-	LCD_Position_t Position;
-//	u8 BufferState;
-
+	LCD_Position_t Position; //for set cursor request
 }LCD_UserReq_t;
+
+
+typedef struct
+{
+	LCD_UserReq_t G_LCD_UserReq[MAX_BUFFER_SIZE];
+	s8 Front;
+	s8 Rear;
+
+}LCD_ReqQueue_t;
+
 
 /****************************************************************************************
  *                        	            Variables                                     *
  ****************************************************************************************/
 
 LCD_Status_t G_LCDStatus = State_Off;
-LCD_UserReq_t G_LCD_UserReq[MAX_BUFFER_SIZE];
-u8 G_LCD_CurrBuff = 0;
+LCD_ReqQueue_t G_LCD_UserReqQueue={.Front=-1,.Rear=-1};
 u8 G_EnableStatus = DISABLED;
 
 extern const LCD_Config_t LCD_Configs[_LCD_Num];
@@ -124,6 +122,7 @@ static void WriteNumProcess(void);
 static void ClearScreenProcess(void);
 static void SetCursorProcess(void);
 static void ReqDoneProcess(void);
+
 /****************************************************************************************
  *                        	              Function Implementations                      *
  ****************************************************************************************/
@@ -157,31 +156,26 @@ Error_t LCD_WriteStringAsynch(u8 * Copy_Str)
 	}
 	else
 	{
-		u8 Loc_Counter = 0;
-		for(Loc_Counter = 0; Loc_Counter < MAX_BUFFER_SIZE; Loc_Counter++)
-		{
-			if(G_LCD_UserReq[Loc_Counter].State == Empty)
-			{
-				G_LCD_UserReq[Loc_Counter].State = Busy;
-				G_LCD_UserReq[Loc_Counter].Type = WriteStr;
-				G_LCD_UserReq[Loc_Counter].Str = Copy_Str;
 
-			/*	u8 i=0;
-							while(G_LCD_UserReq[G_LCD_CurrBuff].Str[i] != '\0')
-							{
-								i++;
-							}
-							G_LCD_UserReq[Loc_Counter].Length = i;*/
-				Ret_LCDErrorStatus = Error_OK;
-				break;
-			}
-		}
-		if(Loc_Counter == MAX_BUFFER_SIZE)
+		if(G_LCD_UserReqQueue.Rear == MAX_BUFFER_SIZE -1)
 		{
 			Ret_LCDErrorStatus = Error_NOK;
 		}
+		else
+		{
+			if(G_LCD_UserReqQueue.Front == -1)
+			{
+				G_LCD_UserReqQueue.Front =0;
+			}
 
+
+			G_LCD_UserReqQueue.Rear++;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Type = WriteStr;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Str = Copy_Str;
+			Ret_LCDErrorStatus = Error_OK;
+		}
 	}
+
 	return Ret_LCDErrorStatus;
 }
 
@@ -189,21 +183,22 @@ Error_t LCD_WriteNumberAsynch(u8 Copy_Num)
 {
 	Error_t Ret_LCDErrorStatus = Error_NOK;
 
-	u8 Loc_Counter = 0;
-	for(Loc_Counter = 0; Loc_Counter < MAX_BUFFER_SIZE; Loc_Counter++)
-	{
-		if(G_LCD_UserReq[Loc_Counter].State == Empty)
-		{
-			G_LCD_UserReq[Loc_Counter].State = Busy;
-			G_LCD_UserReq[Loc_Counter].Type = WriteNum;
-			G_LCD_UserReq[Loc_Counter].Num = Copy_Num;
-			Ret_LCDErrorStatus = Error_OK;
-			break;
-		}
-	}
-	if(Loc_Counter == MAX_BUFFER_SIZE)
+	if(G_LCD_UserReqQueue.Rear == MAX_BUFFER_SIZE -1)
 	{
 		Ret_LCDErrorStatus = Error_NOK;
+	}
+	else
+	{
+		if(G_LCD_UserReqQueue.Front == -1)
+		{
+			G_LCD_UserReqQueue.Front =0;
+		}
+
+
+		G_LCD_UserReqQueue.Rear++;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Type = WriteNum;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Num = Copy_Num;
+		Ret_LCDErrorStatus = Error_OK;
 	}
 
 	return Ret_LCDErrorStatus;
@@ -213,22 +208,22 @@ Error_t LCD_ClearScreenAsynch(void)
 {
 	Error_t Ret_LCDErrorStatus = Error_NOK;
 
-	u8 Loc_Counter = 0;
-	for(Loc_Counter = 0; Loc_Counter < MAX_BUFFER_SIZE; Loc_Counter++)
-	{
-		if(G_LCD_UserReq[Loc_Counter].State == Empty)
-		{
-			G_LCD_UserReq[Loc_Counter].State = Busy;
-			G_LCD_UserReq[Loc_Counter].Type = Clear;
-			Ret_LCDErrorStatus = Error_OK;
-			break;
-		}
-	}
-	if(Loc_Counter == MAX_BUFFER_SIZE)
+	if(G_LCD_UserReqQueue.Rear == MAX_BUFFER_SIZE -1)
 	{
 		Ret_LCDErrorStatus = Error_NOK;
 	}
+	else
+	{
+		if(G_LCD_UserReqQueue.Front == -1)
+		{
+			G_LCD_UserReqQueue.Front =0;
+		}
 
+
+		G_LCD_UserReqQueue.Rear++;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Type = Clear;
+		Ret_LCDErrorStatus = Error_OK;
+	}
 	return Ret_LCDErrorStatus;
 }
 
@@ -253,22 +248,23 @@ Error_t LCD_SetCursorPositionAsynch(u8 Copy_Row, u8 Copy_Column)
 #endif
 	else
 	{
-		u8 Loc_Counter = 0;
-		for(Loc_Counter = 0; Loc_Counter < MAX_BUFFER_SIZE; Loc_Counter++)
-		{
-			if(G_LCD_UserReq[Loc_Counter].State == Empty)
-			{
-				G_LCD_UserReq[Loc_Counter].State = Busy;
-				G_LCD_UserReq[Loc_Counter].Type = SetCursor;
-				G_LCD_UserReq[Loc_Counter].Position.Row = Copy_Row;
-				G_LCD_UserReq[Loc_Counter].Position.Column = Copy_Column;
-				Ret_LCDErrorStatus = Error_OK;
-				break;
-			}
-		}
-		if(Loc_Counter == MAX_BUFFER_SIZE)
+
+		if(G_LCD_UserReqQueue.Rear == MAX_BUFFER_SIZE -1)
 		{
 			Ret_LCDErrorStatus = Error_NOK;
+		}
+		else
+		{
+			if(G_LCD_UserReqQueue.Front == -1)
+			{
+				G_LCD_UserReqQueue.Front =0;
+			}
+
+			G_LCD_UserReqQueue.Rear++;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Type = SetCursor;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Position.Row = Copy_Row;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Rear].Position.Column = Copy_Column;
+			Ret_LCDErrorStatus = Error_OK;
 		}
 	}
 
@@ -398,14 +394,16 @@ void Enablecontrol(u8 Copy_State)
 
 void WriteStrProcess(void)
 {
+
+
 	static u8 Loc_Counter = 0;
 
-	if(G_LCD_UserReq[G_LCD_CurrBuff].Str[Loc_Counter] != '\0')
+	if(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Str[Loc_Counter] != '\0')
 	{
 		switch(G_EnableStatus)
 		{
 		case DISABLED:
-			SendData(G_LCD_UserReq[G_LCD_CurrBuff].Str[Loc_Counter]);
+			SendData(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Str[Loc_Counter] );
 			Enablecontrol(GPIO_STATE_HIGH);
 			G_EnableStatus = ENABLED;
 			break;
@@ -419,26 +417,25 @@ void WriteStrProcess(void)
 	}
 	else
 	{
-		G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = ReqDone;
 		Loc_Counter=0;
 	}
 }
 
 void WriteNumProcess(void)
 {
-
 	static u32 Loc_ReversedNum =1;
 	static u8 Loc_Case = CASE_ZERO;
 
 	switch(Loc_Case )
 	{
 	case 0:
-		if(G_LCD_UserReq[G_LCD_CurrBuff].Num == 0)
+		if(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Num == 0)
 		{
 			switch(G_EnableStatus)
 			{
 			case DISABLED:
-				SendData('0'+G_LCD_UserReq[G_LCD_CurrBuff].Num);
+				SendData('0'+G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Num);
 				Enablecontrol(GPIO_STATE_HIGH);
 				G_EnableStatus = ENABLED;
 				break;
@@ -446,7 +443,7 @@ void WriteNumProcess(void)
 			case ENABLED:
 				Enablecontrol(GPIO_STATE_LOW);
 				G_EnableStatus = DISABLED;
-				G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
+				G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = ReqDone;
 				break;
 			}
 		}
@@ -457,11 +454,11 @@ void WriteNumProcess(void)
 		break;
 
 	case CASE_OTHER:
-		while(G_LCD_UserReq[G_LCD_CurrBuff].Num != 0)
+		while(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Num != 0)
 		{
 			Loc_ReversedNum *=10;
-			Loc_ReversedNum += G_LCD_UserReq[G_LCD_CurrBuff].Num%10;
-			G_LCD_UserReq[G_LCD_CurrBuff].Num /=10;
+			Loc_ReversedNum += G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Num%10;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Num /=10;
 		}
 
 		if(Loc_ReversedNum != 1)
@@ -483,19 +480,17 @@ void WriteNumProcess(void)
 		}
 		else
 		{
-			G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
+			G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = ReqDone;
 			Loc_Case = CASE_ZERO;
 		}
 		break;
 	}
 
-
-
-
 }
 
 void ClearScreenProcess(void)
 {
+
 	switch(G_EnableStatus)
 	{
 	case DISABLED:
@@ -507,25 +502,26 @@ void ClearScreenProcess(void)
 	case ENABLED:
 		Enablecontrol(GPIO_STATE_LOW);
 		G_EnableStatus = DISABLED;
-		G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = ReqDone;
 		break;
 	}
 }
 
 void SetCursorProcess(void)
 {
+
 	u8 Loc_Location = 0;
 	switch(G_EnableStatus)
 	{
 	case DISABLED:
-		if(G_LCD_UserReq[G_LCD_CurrBuff].Position.Row == FIRST_ROW)
+		if(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Position.Row == FIRST_ROW)
 		{
-			Loc_Location = G_LCD_UserReq[G_LCD_CurrBuff].Position.Column;
+			Loc_Location = G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Position.Column;
 		    SendCommand(SET_DDRAM_LOCATION+Loc_Location);
 		}
-		else if(G_LCD_UserReq[G_LCD_CurrBuff].Position.Row == SECOND_ROW)
+		else if(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Position.Row == SECOND_ROW)
 		{
-			Loc_Location = G_LCD_UserReq[G_LCD_CurrBuff].Position.Column + SECOND_ROW_SHIFT;
+			Loc_Location = G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Position.Column + SECOND_ROW_SHIFT;
 		    SendCommand(SET_DDRAM_LOCATION+Loc_Location);
 		}
 		Enablecontrol(GPIO_STATE_HIGH);
@@ -535,20 +531,43 @@ void SetCursorProcess(void)
 	case ENABLED:
 		Enablecontrol(GPIO_STATE_LOW);
 		G_EnableStatus = DISABLED;
-		G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = ReqDone;
 		break;
 	}
 }
 
 void ReqDoneProcess(void)
 {
-	G_LCD_UserReq[G_LCD_CurrBuff].Type = ReqDone;
-	G_LCD_UserReq[G_LCD_CurrBuff].State = Empty;
-	G_LCD_CurrBuff++;
-	if(G_LCD_CurrBuff == MAX_BUFFER_SIZE)
+
+	if(G_LCD_UserReqQueue.Rear == 0)
 	{
-		G_LCD_CurrBuff = 0;
+		G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type = NoReq;
+		G_LCD_UserReqQueue.Front=-1;
+		G_LCD_UserReqQueue.Rear=-1;
 	}
+	else
+	{
+		for(u8 Loc_Counter=0; Loc_Counter<G_LCD_UserReqQueue.Rear ; Loc_Counter++)
+		{
+			if(G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Type == WriteStr)
+			{
+				G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter].Str = G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Str;
+			}
+			else if(G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Type == WriteNum)
+			{
+				G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter].Num = G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Num;
+			}
+			else if(G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Type == SetCursor)
+			{
+				G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter].Position.Row = G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Position.Row;
+				G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter].Position.Column = G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Position.Column;
+			}
+			G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter].Type = G_LCD_UserReqQueue.G_LCD_UserReq[Loc_Counter+1].Type;
+
+		}
+		G_LCD_UserReqQueue.Rear--;
+	}
+
 }
 /****************************************************************************************
  *                        	              Runnables                                   *
@@ -561,10 +580,9 @@ void LCD_Task(void)
 	{
 		InitSM();
 	}
-	else if(G_LCDStatus == State_Operational )
+	else if(G_LCDStatus == State_Operational && G_LCD_UserReqQueue.Front != -1)
 	{
-		//&& G_LCD_UserReq[G_LCD_CurrBuff].State == Busy
-		switch(G_LCD_UserReq[G_LCD_CurrBuff].Type)
+		switch(G_LCD_UserReqQueue.G_LCD_UserReq[G_LCD_UserReqQueue.Front].Type )
 		{
 		case WriteStr:
 			WriteStrProcess();
@@ -587,11 +605,6 @@ void LCD_Task(void)
 			break;
 
 		default:
-			G_LCD_CurrBuff++;
-			if(G_LCD_CurrBuff == MAX_BUFFER_SIZE)
-			{
-				G_LCD_CurrBuff = 0;
-			}
 			break;
 		}
 	}

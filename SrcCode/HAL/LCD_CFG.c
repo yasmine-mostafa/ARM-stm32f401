@@ -63,19 +63,19 @@ const LCD_Config_t LCD_Configs[_LCD_Num]=
 		[Enable]=
 		{
 				.Port = GPIO_PORTB,
-				.Pin = GPIO_PIN0
+				.Pin = GPIO_PIN8
 		},
 
 		[RW]=
 		{
 				.Port = GPIO_PORTB,
-				.Pin = GPIO_PIN1
+				.Pin = GPIO_PIN9
 		},
 
 		[RS]=
 		{
 				.Port = GPIO_PORTB,
-				.Pin = GPIO_PIN2
+				.Pin = GPIO_PIN10
 		}
 };
 

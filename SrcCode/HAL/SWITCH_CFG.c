@@ -14,17 +14,17 @@
 
 const SWITCH_Config_t SWITCHES_Config[_SWITCH_NUM]=
 {
-		[SWITCH_1]=
+		[Mode_Button]=
 		{
 				.Port=GPIO_PORTB,
 				.Pin=GPIO_PIN0,
 				.Connection=CONNECTION_PULL_UP
 		},
 
-		[SWITCH_2]=
+	/*	[SWITCH_2]=
 		{
 				.Port=GPIO_PORTA,
 				.Pin=GPIO_PIN0,
 				.Connection=CONNECTION_PULL_UP
-		}
+		}*/
 };

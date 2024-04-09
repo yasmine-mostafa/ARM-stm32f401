@@ -13,8 +13,8 @@
  */
 typedef enum
 {
-	SWITCH_1,
-	SWITCH_2,
+	Mode_Button,
+	//SWITCH_2,
 
 	_SWITCH_NUM
 }SWITCH_ID_t;

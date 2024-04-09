@@ -14,7 +14,7 @@
 typedef enum
 {
 	LED_Green,
-	LED_Yellow,
+	//LED_Yellow,
 	LED_Red,
 
 	_LED_Num
