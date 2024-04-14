@@ -100,6 +100,6 @@ Error_t LCD_WriteStringAsynch(u8 * Str);
  *@param  : Number to be Written.
  *@return : Error State.
  */
-Error_t LCD_WriteNumberAsynch(u8 Num);
+Error_t LCD_WriteNumberAsynch(u32 Num);
 
 #endif /* HAL_INCLUDES_LCD_H_ */

@@ -19,7 +19,7 @@
  * 1-LCD_CURSOR_ON
  * 2-LCD_CURSOR_OFF
  */
-#define LCD_CURSOR LCD_CURSOR_OFF
+#define LCD_CURSOR LCD_CURSOR_ON
 /*
  * Select:
  * 1-LCD_BLINK_ON
@@ -50,8 +50,5 @@
  * 2-LCD_5X10_CHAR_FONT
  */
 #define LCD_FONT LCD_5X7_CHAR_FONT
-
-
-
 
 #endif /* HAL_INCLUDES_LCD_CFG_H_ */
